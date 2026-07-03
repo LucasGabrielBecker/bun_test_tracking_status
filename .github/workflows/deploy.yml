@@ -22,7 +22,7 @@ jobs:
             - name: Install dependencies
               run: bun install
             - name: Build
-              run: bun build --minify --target=browser app.ts --outdir ./dist
+              run: bun build --minify --target=browser ./index.html ./**.ts --outdir ./dist
             - name: Copy static files
               run: cp index.html dist/
             - name: Deploy to GitHub Pages
