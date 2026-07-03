@@ -12,7 +12,7 @@ import {
 // (etapa "Enviando dados") que não é representado por um evento concluído.
 type DisplayStatus = 'success' | 'sending' | 'failure'
 
-const TARGET_LABELS: Record<IntegrationTarget, string> = {
+const TARGET_LABELS: Record<string, string> = {
     acelerador: 'Acelerador',
     esl: 'TMS Externo'
 }
@@ -22,8 +22,6 @@ const STATUS_ICON: Record<DisplayStatus, string> = {
     sending: '↻',
     failure: '✕'
 }
-
-const targets: IntegrationTarget[] = ['acelerador', 'esl']
 
 /* ------------------------------------------------------------------ */
 /* Legenda de estados (reprodução do screenshot)                      */
@@ -55,15 +53,18 @@ const STATE_LEGEND: {
     }
 ]
 
-function integrationRow(target: IntegrationTarget, status: DisplayStatus): string {
+// target: string -> function integrationRow
+function integrationRow(target: string, status: DisplayStatus): string {
     return `
         <div class="integration integration--${status}">
             <span class="integration__icon">${STATUS_ICON[status]}</span>
-            <span class="integration__name">${TARGET_LABELS[target]}</span>
+            <span class="integration__name">${TARGET_LABELS[target] || target}</span>
         </div>`
 }
 
 function legendCard(item: (typeof STATE_LEGEND)[number]): string {
+    // Para a legenda, ainda precisamos de targets. Vamos usar os conhecidos.
+    const targets: string[] = ['acelerador', 'esl']
     const rows = targets
         .map((target) => integrationRow(target, item.status))
         .join('')
@@ -178,6 +179,7 @@ function escapeHtml(value: string): string {
 
 // Monta o JSON puro que documenta a entrada (eventos) e a derivação do status.
 function derivationJson(events: IntegrationEvent[]): string {
+    const targets = Array.from(new Set(events.map((e) => e.integrationTarget)))
     const derivation = {
         // Entrada: os eventos recebidos, na ordem.
         events,
@@ -187,7 +189,7 @@ function derivationJson(events: IntegrationEvent[]): string {
             targets.map((target) => {
                 const targetEvents = events.filter((e) => e.integrationTarget === target)
                 return [
-                    TARGET_LABELS[target],
+                    TARGET_LABELS[target] || target,
                     {
                         passos: scanState(targetEvents).map((step, i) => ({
                             passo: i + 1,
@@ -208,6 +210,7 @@ function derivationJson(events: IntegrationEvent[]): string {
 
 function scenarioCard(scenario: Scenario, index: number): string {
     const byTarget = stateByTarget(scenario.events)
+    const targets = Object.keys(byTarget)
     const global = reduceState(scenario.events)
     const globalDisplay = toDisplay(global)
 
@@ -217,7 +220,7 @@ function scenarioCard(scenario: Scenario, index: number): string {
             return `
                 <div class="integration integration--${display}">
                     <span class="integration__icon">${STATUS_ICON[display]}</span>
-                    <span class="integration__name">${TARGET_LABELS[target]}</span>
+                    <span class="integration__name">${TARGET_LABELS[target] || target}</span>
                 </div>`
         })
         .join('')
