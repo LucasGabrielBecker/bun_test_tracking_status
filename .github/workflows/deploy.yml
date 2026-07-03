@@ -1,0 +1,33 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+      - name: Install dependencies
+        run: bun install
+      - name: Build
+        run: bun build --minify --target=browser app.ts --outdir ./dist
+      - name: Copy static files
+        run: cp index.html dist/
+      - name: Deploy to GitHub Pages
+        uses: actions/configure-pages@v5
+        id: pages
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+      - name: Deploy
+        uses: actions/deploy-pages@v4
