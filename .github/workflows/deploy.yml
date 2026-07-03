@@ -22,9 +22,10 @@ jobs:
             - name: Install dependencies
               run: bun install
             - name: Build
-              run: bun build --minify --target=browser ./index.html ./**.ts --outdir ./dist
-            - name: Copy static files
-              run: cp index.html dist/
+              run: |
+                mkdir -p dist
+                bun build --minify --target=browser app.ts --outfile dist/app.js
+                cp index.html dist/
             - name: Deploy to GitHub Pages
               uses: actions/configure-pages@v5
               id: pages
