@@ -1,444 +1,425 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Status Integração</title>
-    <style>
-        :root {
-            --green: #22c55e;
-            --green-soft: #86efac;
-            --green-bg: #ecfdf5;
-            --blue: #3b82f6;
-            --blue-bg: #eff6ff;
-            --red: #ef4444;
-            --red-soft: #fca5a5;
-            --red-bg: #fef2f2;
-            --purple: #7c3aed;
-            --ink: #1f2937;
-            --muted: #6b7280;
-            --line: #d1d5db;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            padding: 32px 40px 56px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                Helvetica, Arial, sans-serif;
-            color: var(--ink);
-            background: #ffffff;
-        }
-
-        h1 {
-            font-size: 22px;
-            font-weight: 700;
-            margin: 0 0 28px;
-        }
-
-        h1 .accent {
-            color: var(--purple);
-            font-weight: 600;
-        }
-
-        /* ---------- Fluxo superior ---------- */
-        .flow-frame {
-            position: relative;
-            border: 2px dashed var(--purple);
-            border-radius: 14px;
-            padding: 22px 24px;
-            margin-bottom: 12px;
-        }
-
-        .flow-frame__label {
-            position: absolute;
-            top: -12px;
-            right: 24px;
-            background: #fff;
-            padding: 0 8px;
-            color: var(--muted);
-            font-size: 14px;
-        }
-
-        .flow {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .flow__step {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 15px;
-            white-space: nowrap;
-        }
-
-        .flow__arrow {
-            color: var(--muted);
-            letter-spacing: 2px;
-        }
-
-        .flow__arrow--green {
-            color: var(--green);
-        }
-
-        .flow__arrow--red {
-            color: var(--red);
-        }
-
-        .pill {
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .pill--green {
-            background: var(--green-soft);
-            color: #14532d;
-        }
-
-        .pill--red {
-            background: var(--red-soft);
-            color: #7f1d1d;
-        }
-
-        .node--decision {
-            background: #000;
-            color: #fff;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-weight: 600;
-        }
-
-        .flow__loop {
-            display: flex;
-            justify-content: center;
-            margin-top: 6px;
-        }
-
-        .flow__loop .pill--green {
-            font-size: 13px;
-        }
-
-        /* ---------- Seção hover ---------- */
-        .hover-title {
-            display: block;
-            width: max-content;
-            margin: 40px auto 20px;
-            background: var(--green-soft);
-            color: #14532d;
-            font-weight: 700;
-            padding: 10px 22px;
-            border-radius: 10px;
-            font-size: 16px;
-        }
-
-        .scenarios-frame {
-            border: 2px dashed var(--green-soft);
-            border-radius: 14px;
-            padding: 28px 24px 36px;
-        }
-
-        #scenarios {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-        }
-
-        .scenario {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .scenario__header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            font-size: 15px;
-            align-self: flex-start;
-            margin-bottom: 12px;
-        }
-
-        .scenario--success .scenario__title {
-            color: var(--ink);
-        }
-        .scenario--sending .scenario__title {
-            color: var(--blue);
-        }
-        .scenario--failure .scenario__title {
-            color: var(--ink);
-        }
-
-        .scenario__card {
-            width: 100%;
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-            background: #fff;
-        }
-
-        .scenario--success .scenario__card {
-            background: linear-gradient(180deg, #fff, var(--green-bg));
-        }
-        .scenario--sending .scenario__card {
-            background: linear-gradient(180deg, #fff, var(--blue-bg));
-        }
-        .scenario--failure .scenario__card {
-            background: #fff;
-        }
-
-        .scenario__card-label {
-            color: var(--muted);
-            font-size: 13px;
-            margin-bottom: 12px;
-        }
-
-        .integration {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            padding: 6px 0;
-        }
-
-        .integration__icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            color: #fff;
-            font-size: 13px;
-            font-weight: 700;
-            flex: none;
-        }
-
-        .integration--success .integration__icon {
-            background: var(--green);
-        }
-        .integration--success .integration__name {
-            color: #15803d;
-        }
-
-        .integration--sending .integration__icon {
-            background: transparent;
-            color: var(--blue);
-            border: 2px solid var(--blue);
-            border-right-color: transparent;
-            animation: spin 1s linear infinite;
-        }
-        .integration--sending .integration__name {
-            color: var(--blue);
-        }
-
-        .integration--failure .integration__icon {
-            background: var(--red-bg);
-            color: var(--red);
-            border: 1px solid var(--red-soft);
-        }
-        .integration--failure .integration__name {
-            color: var(--red);
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Status Integração</title>
+        <style>
+            :root {
+                --green: #22c55e;
+                --green-soft: #86efac;
+                --green-bg: #ecfdf5;
+                --blue: #3b82f6;
+                --blue-bg: #eff6ff;
+                --red: #ef4444;
+                --red-soft: #fca5a5;
+                --red-bg: #fef2f2;
+                --purple: #7c3aed;
+                --ink: #1f2937;
+                --muted: #6b7280;
+                --line: #d1d5db;
             }
-        }
 
-        .scenario__connector {
-            width: 0;
-            height: 26px;
-            border-left: 2px dashed var(--green-soft);
-            margin: 4px 0;
-        }
+            * {
+                box-sizing: border-box;
+            }
 
-        .scenario__description {
-            width: 100%;
-            background: var(--green-soft);
-            color: #14532d;
-            font-size: 13px;
-            text-align: center;
-            padding: 12px 14px;
-            border-radius: 8px;
-        }
+            body {
+                margin: 0;
+                padding: 32px 40px 56px;
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                    Helvetica, Arial, sans-serif;
+                color: var(--ink);
+                background: #ffffff;
+            }
 
-        /* ---------- Cenários orientados a eventos ---------- */
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin: 48px 0 6px;
-        }
+            h1 {
+                font-size: 22px;
+                font-weight: 700;
+                margin: 0 0 28px;
+            }
 
-        .section-hint {
-            color: var(--muted);
-            font-size: 14px;
-            margin: 0 0 20px;
-            max-width: 720px;
-        }
+            h1 .accent {
+                color: var(--purple);
+                font-weight: 600;
+            }
 
-        .section-hint code {
-            background: #f3f4f6;
-            padding: 1px 5px;
-            border-radius: 4px;
-            font-size: 13px;
-        }
+            /* ---------- Fluxo superior ---------- */
+            .flow-frame {
+                position: relative;
+                border: 2px dashed var(--purple);
+                border-radius: 14px;
+                padding: 22px 24px;
+                margin-bottom: 12px;
+            }
 
-        #event-scenarios {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
+            .flow-frame__label {
+                position: absolute;
+                top: -12px;
+                right: 24px;
+                background: #fff;
+                padding: 0 8px;
+                color: var(--muted);
+                font-size: 14px;
+            }
 
-        .scn {
-            border: 1px solid var(--line);
-            border-left: 4px solid var(--line);
-            border-radius: 12px;
-            padding: 16px 18px;
-            background: #fff;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-        }
+            .flow {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
 
-        .scn--success {
-            border-left-color: var(--green);
-        }
-        .scn--failure {
-            border-left-color: var(--red);
-        }
+            .flow__step {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 15px;
+                white-space: nowrap;
+            }
 
-        .scn__head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 6px;
-        }
+            .flow__arrow {
+                color: var(--muted);
+                letter-spacing: 2px;
+            }
 
-        .scn__name {
-            font-weight: 700;
-            font-size: 15px;
-        }
+            .flow__arrow--green {
+                color: var(--green);
+            }
 
-        .badge {
-            text-transform: uppercase;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.4px;
-            padding: 3px 9px;
-            border-radius: 999px;
-        }
+            .flow__arrow--red {
+                color: var(--red);
+            }
 
-        .badge--success {
-            background: var(--green-bg);
-            color: #15803d;
-        }
-        .badge--failure {
-            background: var(--red-bg);
-            color: var(--red);
-        }
+            .pill {
+                padding: 6px 12px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+            }
 
-        .scn__desc {
-            color: var(--muted);
-            font-size: 13px;
-            margin: 0 0 12px;
-        }
+            .pill--green {
+                background: var(--green-soft);
+                color: #14532d;
+            }
 
-        .scn__targets {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 14px;
-        }
+            .pill--red {
+                background: var(--red-soft);
+                color: #7f1d1d;
+            }
 
-        .scn__toggle {
-            appearance: none;
-            border: 1px solid var(--line);
-            background: #f9fafb;
-            color: var(--ink);
-            font-size: 13px;
-            font-weight: 600;
-            padding: 7px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.15s ease, border-color 0.15s ease;
-        }
+            .node--decision {
+                background: #000;
+                color: #fff;
+                padding: 8px 14px;
+                border-radius: 8px;
+                font-weight: 600;
+            }
 
-        .scn__toggle:hover {
-            background: #f3f4f6;
-            border-color: #9ca3af;
-        }
+            .flow__loop {
+                display: flex;
+                justify-content: center;
+                margin-top: 6px;
+            }
 
-        .scn__events {
-            margin-top: 14px;
-            border-top: 1px dashed var(--line);
-            padding-top: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
+            .flow__loop .pill--green {
+                font-size: 13px;
+            }
 
-        .scn__events[hidden] {
-            display: none;
-        }
+            /* ---------- Seção hover ---------- */
+            .hover-title {
+                display: block;
+                width: max-content;
+                margin: 40px auto 20px;
+                background: var(--green-soft);
+                color: #14532d;
+                font-weight: 700;
+                padding: 10px 22px;
+                border-radius: 10px;
+                font-size: 16px;
+            }
 
-        /* JSON puro: apenas o mínimo para leitura, sem estilizar os eventos. */
-        .scn__events pre {
-            margin: 0;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            font-size: 12px;
-            line-height: 1.5;
-            white-space: pre;
-            overflow-x: auto;
-        }
-    </style>
-</head>
-<body>
-    <h1>Status Integração <span class="accent">ação</span></h1>
+            .scenarios-frame {
+                border: 2px dashed var(--green-soft);
+                border-radius: 14px;
+                padding: 28px 24px 36px;
+            }
 
-    <section class="flow-frame">
-        <span class="flow-frame__label">Frame ...</span>
-        <div class="flow">
-            <span class="flow__step">🌐 Dados enviados com sucesso</span>
-            <span class="flow__arrow flow__arrow--green">- - -</span>
-            <span class="pill pill--green">Realiza alterações</span>
-            <span class="flow__arrow flow__arrow--green">- - ›</span>
-            <span class="flow__step" style="color: var(--blue)">🔄 Enviando dados</span>
-            <span class="flow__arrow">- - -</span>
-            <span class="node--decision">Sucesso?</span>
-            <span class="flow__arrow flow__arrow--red">- - ›</span>
-            <span class="pill pill--red">Não</span>
-            <span class="flow__arrow flow__arrow--red">- ✕ ›</span>
-            <span class="flow__step">✕ Dados não enviados</span>
-        </div>
-        <div class="flow__loop">
-            <span class="pill pill--green">Sim</span>
-        </div>
-    </section>
+            #scenarios {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 24px;
+            }
 
-    <span class="hover-title">Interação em Hover</span>
+            .scenario {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
 
-    <section class="scenarios-frame">
-        <div id="scenarios"></div>
-    </section>
+            .scenario__header {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-weight: 600;
+                font-size: 15px;
+                align-self: flex-start;
+                margin-bottom: 12px;
+            }
 
-    <h2 class="section-title">Cenários orientados a eventos</h2>
-    <p class="section-hint">
-        Cada cenário é um conjunto de eventos reduzido pela lógica de
-        <code>index.ts</code>. Clique em <strong>“Ver eventos”</strong> para
-        inspecionar a sequência que levou ao estado.
-    </p>
-    <section id="event-scenarios"></section>
+            .scenario--success .scenario__title {
+                color: var(--ink);
+            }
+            .scenario--sending .scenario__title {
+                color: var(--blue);
+            }
+            .scenario--failure .scenario__title {
+                color: var(--ink);
+            }
 
-    <script type="module" src="./app.js"></script>
-</body>
+            .scenario__card {
+                width: 100%;
+                border-radius: 12px;
+                padding: 16px;
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+                background: #fff;
+            }
+
+            .scenario--success .scenario__card {
+                background: linear-gradient(180deg, #fff, var(--green-bg));
+            }
+            .scenario--sending .scenario__card {
+                background: linear-gradient(180deg, #fff, var(--blue-bg));
+            }
+            .scenario--failure .scenario__card {
+                background: #fff;
+            }
+
+            .scenario__card-label {
+                color: var(--muted);
+                font-size: 13px;
+                margin-bottom: 12px;
+            }
+
+            .integration {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 16px;
+                font-weight: 600;
+                padding: 6px 0;
+            }
+
+            .integration__icon {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                color: #fff;
+                font-size: 13px;
+                font-weight: 700;
+                flex: none;
+            }
+
+            .integration--success .integration__icon {
+                background: var(--green);
+            }
+            .integration--success .integration__name {
+                color: #15803d;
+            }
+
+            .integration--sending .integration__icon {
+                background: transparent;
+                color: var(--blue);
+                border: 2px solid var(--blue);
+                border-right-color: transparent;
+                animation: spin 1s linear infinite;
+            }
+            .integration--sending .integration__name {
+                color: var(--blue);
+            }
+
+            .integration--failure .integration__icon {
+                background: var(--red-bg);
+                color: var(--red);
+                border: 1px solid var(--red-soft);
+            }
+            .integration--failure .integration__name {
+                color: var(--red);
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .scenario__connector {
+                width: 0;
+                height: 26px;
+                border-left: 2px dashed var(--green-soft);
+                margin: 4px 0;
+            }
+
+            .scenario__description {
+                width: 100%;
+                background: var(--green-soft);
+                color: #14532d;
+                font-size: 13px;
+                text-align: center;
+                padding: 12px 14px;
+                border-radius: 8px;
+            }
+
+            /* ---------- Cenários orientados a eventos ---------- */
+            .section-title {
+                font-size: 18px;
+                font-weight: 700;
+                margin: 48px 0 6px;
+            }
+
+            .section-hint {
+                color: var(--muted);
+                font-size: 14px;
+                margin: 0 0 20px;
+                max-width: 720px;
+            }
+
+            .section-hint code {
+                background: #f3f4f6;
+                padding: 1px 5px;
+                border-radius: 4px;
+                font-size: 13px;
+            }
+
+            #event-scenarios {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 20px;
+            }
+
+            .scn {
+                border: 1px solid var(--line);
+                border-left: 4px solid var(--line);
+                border-radius: 12px;
+                padding: 16px 18px;
+                background: #fff;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+            }
+
+            .scn--success {
+                border-left-color: var(--green);
+            }
+            .scn--failure {
+                border-left-color: var(--red);
+            }
+
+            .scn__head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                margin-bottom: 6px;
+            }
+
+            .scn__name {
+                font-weight: 700;
+                font-size: 15px;
+            }
+
+            .badge {
+                text-transform: uppercase;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.4px;
+                padding: 3px 9px;
+                border-radius: 999px;
+            }
+
+            .badge--success {
+                background: var(--green-bg);
+                color: #15803d;
+            }
+            .badge--failure {
+                background: var(--red-bg);
+                color: var(--red);
+            }
+
+            .scn__desc {
+                color: var(--muted);
+                font-size: 13px;
+                margin: 0 0 12px;
+            }
+
+            .scn__targets {
+                display: flex;
+                gap: 16px;
+                flex-wrap: wrap;
+                margin-bottom: 14px;
+            }
+
+            .scn__toggle {
+                appearance: none;
+                border: 1px solid var(--line);
+                background: #f9fafb;
+                color: var(--ink);
+                font-size: 13px;
+                font-weight: 600;
+                padding: 7px 12px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition:
+                    background 0.15s ease,
+                    border-color 0.15s ease;
+            }
+
+            .scn__toggle:hover {
+                background: #f3f4f6;
+                border-color: #9ca3af;
+            }
+
+            .scn__events {
+                margin-top: 14px;
+                border-top: 1px dashed var(--line);
+                padding-top: 12px;
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+            }
+
+            .scn__events[hidden] {
+                display: none;
+            }
+
+            /* JSON puro: apenas o mínimo para leitura, sem estilizar os eventos. */
+            .scn__events pre {
+                margin: 0;
+                font-family:
+                    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+                font-size: 12px;
+                line-height: 1.5;
+                white-space: pre;
+                overflow-x: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Status Integração <span class="accent">ação</span></h1>
+        <section class="scenarios-frame">
+            <div id="scenarios"></div>
+        </section>
+
+        <h2 class="section-title">Cenários orientados a eventos</h2>
+        <p class="section-hint">
+            Cada cenário é um conjunto de eventos reduzido pela lógica de
+            <code>index.ts</code>. Clique em <strong>“Ver eventos”</strong> para
+            inspecionar a sequência que levou ao estado.
+        </p>
+        <section id="event-scenarios"></section>
+
+        <script type="module" src="./app.js"></script>
+    </body>
 </html>
