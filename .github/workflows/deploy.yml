@@ -23,9 +23,9 @@ jobs:
               run: bun install
             - name: Build
               run: |
-                mkdir -p dist
-                bun build --minify --target=browser app.ts --outfile dist/app.js
-                cp index.html dist/
+                  mkdir -p dist
+                  bun run build
+                  cp index.html dist/
             - name: Deploy to GitHub Pages
               uses: actions/configure-pages@v5
               id: pages
