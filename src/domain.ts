@@ -74,12 +74,12 @@ export const scanState = (events: IntegrationEvent[]): ScanStep[] => {
     return steps
 }
 
-// Reduz os eventos por alvo (Acelerador / ESL) para obter o estado de cada integração.
+// Reduz os eventos por alvo para obter o estado de cada integração encontrada.
 export const stateByTarget = (
     events: IntegrationEvent[]
-): Record<IntegrationTarget, IntegrationState> => {
-    const targets: IntegrationTarget[] = ['acelerador', 'esl']
-    const result = {} as Record<IntegrationTarget, IntegrationState>
+): Record<string, IntegrationState> => {
+    const targets = Array.from(new Set(events.map((e) => e.integrationTarget)))
+    const result = {} as Record<string, IntegrationState>
     for (const target of targets) {
         const targetEvents = events.filter((e) => e.integrationTarget === target)
         result[target] = targetEvents.reduce(evolve, initialState)
