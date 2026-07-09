@@ -5,7 +5,8 @@
     "private": true,
     "scripts": {
         "build": "bun build --minify --target=browser index.html **.ts --outdir dist",
-        "start:prod": "bun dist/index.html"
+        "start:prod": "bun dist/index.html",
+        "start:dev": "bun --watch index.html"
     },
     "devDependencies": {
         "@types/bun": "latest"

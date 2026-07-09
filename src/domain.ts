@@ -12,7 +12,7 @@ export type IntegrationType =
 export type IntegrationEvent = {
     integrationTarget: IntegrationTarget
     integrationType: IntegrationType
-    integrationResult: 'success' | 'failure'
+    integrationResult: 'success' | 'failure' | 'pending'
     integrationError?: string
 }
 
@@ -41,7 +41,7 @@ export const tripevents: IntegrationEvent[] = [
     }
 ]
 
-export type IntegrationState = { status: 'success' | 'failure'; error?: string }
+export type IntegrationState = { status: 'success' | 'failure' | 'sending'; error?: string }
 
 export const initialState: IntegrationState = { status: 'success' }
 
@@ -51,8 +51,10 @@ export const evolve = (
 ): IntegrationState => {
     if (event.integrationResult === 'success') {
         return { status: 'success' }
-    } else {
+    } else if (event.integrationResult === 'failure') {
         return { status: 'failure', error: event.integrationError }
+    } else {
+        return { status: 'sending' }
     }
 }
 

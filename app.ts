@@ -113,7 +113,9 @@ const SCENARIOS: Scenario[] = [
                 integrationResult: 'failure',
                 integrationError: 'Timeout ao acessar sistema externo'
             },
-            { integrationTarget: 'esl', integrationType: 'customer', integrationResult: 'success' }
+            { integrationTarget: 'esl', integrationType: 'customer', integrationResult: 'success' },
+            { integrationTarget: 'esl', integrationType: 'other', integrationResult: 'failure' }
+
         ]
     },
     {
@@ -155,6 +157,17 @@ const SCENARIOS: Scenario[] = [
         ]
     },
     {
+        name: 'Estado de processando',
+        description: 'Uma integração está em processamento.',
+        events: [
+            {
+                integrationTarget: 'acelerador',
+                integrationType: 'customer',
+                integrationResult: 'pending'
+            }
+        ]
+    },
+    {
         name: 'Eventos originais (index.ts)',
         description: 'O conjunto de eventos definido em tripevents.',
         events: tripevents
@@ -167,7 +180,8 @@ const SCENARIOS: Scenario[] = [
 ]
 
 function toDisplay(state: IntegrationState): DisplayStatus {
-    return state.status === 'success' ? 'success' : 'failure'
+    if(state.status === 'success') return 'success'
+    return state.status === 'failure' ? 'failure' : 'sending'
 }
 
 function escapeHtml(value: string): string {
