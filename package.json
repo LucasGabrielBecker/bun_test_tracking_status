@@ -4,7 +4,7 @@
     "type": "module",
     "private": true,
     "scripts": {
-        "build": "bun build --minify --target=browser index.html **.ts --outdir dist",
+        "build": "bun build --minify --target=browser index.html **.ts ./src/**.ts --outdir dist",
         "start:prod": "bun dist/index.html",
         "start:dev": "bun --watch index.html"
     },
