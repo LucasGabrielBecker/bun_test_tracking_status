@@ -3,6 +3,7 @@ import {
     reduceState,
     stateByTarget,
     scanState,
+    withStarted,
     type IntegrationEvent,
     type IntegrationTarget,
     type IntegrationState
@@ -115,7 +116,7 @@ const SCENARIOS: Scenario[] = [
                 integrationError: 'Timeout ao acessar sistema externo'
             },
             { type: 'integration-completed', integrationTarget: 'esl', integrationType: 'customer', integrationResult: 'success' },
-            { type: 'integration-completed', integrationTarget: 'esl', integrationType: 'other', integrationResult: 'failure' }
+            { type: 'integration-completed', integrationTarget: 'esl', integrationType: 'other', integrationResult: 'failure', integrationError: 'Erro ao acessar sistema externo' }
 
         ]
     },
@@ -182,7 +183,7 @@ const SCENARIOS: Scenario[] = [
         description: 'Nenhum evento recebido — permanece no estado inicial.',
         events: []
     }
-]
+].map((scenario) => ({ ...scenario, events: withStarted(scenario.events) }))
 
 function toDisplay(state: IntegrationState): DisplayStatus {
     if(state.status === 'success') return 'success'

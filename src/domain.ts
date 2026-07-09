@@ -19,11 +19,37 @@ export type IntegrationEvent =
           type: 'integration-completed'
           integrationTarget: IntegrationTarget
           integrationType: IntegrationType
-          integrationResult: 'success' | 'failure'
-          integrationError?: string
+          integrationResult: 'success'
+      }
+    | {
+          type: 'integration-completed'
+          integrationTarget: IntegrationTarget
+          integrationType: IntegrationType
+          integrationResult: 'failure'
+          integrationError: string
       }
 
-export const tripevents: IntegrationEvent[] = [
+export const withStarted = (events: IntegrationEvent[]): IntegrationEvent[] =>
+    events.flatMap((event, index) => {
+        const previous = events[index - 1]
+        const alreadyStarted =
+            previous?.type === 'integration-started' &&
+            previous.integrationTarget === event.integrationTarget &&
+            previous.integrationType === event.integrationType
+
+        return event.type === 'integration-completed' && !alreadyStarted
+            ? [
+                  {
+                      type: 'integration-started',
+                      integrationTarget: event.integrationTarget,
+                      integrationType: event.integrationType
+                  } as const,
+                  event
+              ]
+            : [event]
+    })
+
+export const tripevents: IntegrationEvent[] = withStarted([
     {
         type: 'integration-completed',
         integrationTarget: 'acelerador',
@@ -50,7 +76,7 @@ export const tripevents: IntegrationEvent[] = [
         integrationType: 'customer',
         integrationResult: 'success'
     }
-]
+])
 
 export type IntegrationState = { status: 'success' | 'failure' | 'pending'; error?: string }
 
