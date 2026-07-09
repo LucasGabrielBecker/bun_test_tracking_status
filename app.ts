@@ -8,9 +8,9 @@ import {
     type IntegrationState
 } from './src/domain.ts'
 
-// Status usado apenas pela UI. 'sending' é um estado transitório do fluxo
+// Status usado apenas pela UI. 'pending' é um estado transitório do fluxo
 // (etapa "Enviando dados") que não é representado por um evento concluído.
-type DisplayStatus = 'success' | 'sending' | 'failure'
+type DisplayStatus = 'success' | 'pending' | 'failure'
 
 const TARGET_LABELS: Record<string, string> = {
     acelerador: 'Acelerador',
@@ -19,7 +19,7 @@ const TARGET_LABELS: Record<string, string> = {
 
 const STATUS_ICON: Record<DisplayStatus, string> = {
     success: '✓',
-    sending: '↻',
+    pending: '↻',
     failure: '✕'
 }
 
@@ -40,7 +40,7 @@ const STATE_LEGEND: {
         description: 'Indica integrações que estão sincronizadas'
     },
     {
-        status: 'sending',
+        status: 'pending',
         icon: '🔄',
         title: 'Enviando dados',
         description: 'Indica integrações que estão recebendo dados'
@@ -99,8 +99,8 @@ const SCENARIOS: Scenario[] = [
         name: 'Tudo sincronizado',
         description: 'Ambas as integrações concluíram com sucesso.',
         events: [
-            { integrationTarget: 'acelerador', integrationType: 'order', integrationResult: 'success' },
-            { integrationTarget: 'esl', integrationType: 'customer', integrationResult: 'success' }
+            { type: 'integration-completed', integrationTarget: 'acelerador', integrationType: 'order', integrationResult: 'success' },
+            { type: 'integration-completed', integrationTarget: 'esl', integrationType: 'customer', integrationResult: 'success' }
         ]
     },
     {
@@ -108,13 +108,14 @@ const SCENARIOS: Scenario[] = [
         description: 'O Acelerador falhou; o TMS Externo seguiu sincronizado.',
         events: [
             {
+                type: 'integration-completed',
                 integrationTarget: 'acelerador',
                 integrationType: 'order',
                 integrationResult: 'failure',
                 integrationError: 'Timeout ao acessar sistema externo'
             },
-            { integrationTarget: 'esl', integrationType: 'customer', integrationResult: 'success' },
-            { integrationTarget: 'esl', integrationType: 'other', integrationResult: 'failure' }
+            { type: 'integration-completed', integrationTarget: 'esl', integrationType: 'customer', integrationResult: 'success' },
+            { type: 'integration-completed', integrationTarget: 'esl', integrationType: 'other', integrationResult: 'failure' }
 
         ]
     },
@@ -123,12 +124,14 @@ const SCENARIOS: Scenario[] = [
         description: 'As duas integrações terminaram em erro.',
         events: [
             {
+                type: 'integration-completed',
                 integrationTarget: 'acelerador',
                 integrationType: 'invoice',
                 integrationResult: 'failure',
                 integrationError: 'Serviço indisponível (503)'
             },
             {
+                type: 'integration-completed',
                 integrationTarget: 'esl',
                 integrationType: 'shipping',
                 integrationResult: 'failure',
@@ -141,19 +144,21 @@ const SCENARIOS: Scenario[] = [
         description: 'Houve falha, mas um reenvio posterior teve sucesso (o último evento vence).',
         events: [
             {
+                type: 'integration-completed',
                 integrationTarget: 'acelerador',
                 integrationType: 'payment',
                 integrationResult: 'failure',
                 integrationError: 'Conexão recusada'
             },
-            { integrationTarget: 'acelerador', integrationType: 'payment', integrationResult: 'success' },
+            { type: 'integration-completed', integrationTarget: 'acelerador', integrationType: 'payment', integrationResult: 'success' },
             {
+                type: 'integration-completed',
                 integrationTarget: 'esl',
                 integrationType: 'inventory',
                 integrationResult: 'failure',
                 integrationError: 'Estoque bloqueado'
             },
-            { integrationTarget: 'esl', integrationType: 'inventory', integrationResult: 'success' }
+            { type: 'integration-completed', integrationTarget: 'esl', integrationType: 'inventory', integrationResult: 'success' }
         ]
     },
     {
@@ -161,9 +166,9 @@ const SCENARIOS: Scenario[] = [
         description: 'Uma integração está em processamento.',
         events: [
             {
+                type: 'integration-started',
                 integrationTarget: 'acelerador',
-                integrationType: 'customer',
-                integrationResult: 'pending'
+                integrationType: 'customer'
             }
         ]
     },
@@ -181,7 +186,7 @@ const SCENARIOS: Scenario[] = [
 
 function toDisplay(state: IntegrationState): DisplayStatus {
     if(state.status === 'success') return 'success'
-    return state.status === 'failure' ? 'failure' : 'sending'
+    return state.status === 'failure' ? 'failure' : 'pending'
 }
 
 function escapeHtml(value: string): string {

@@ -9,39 +9,50 @@ export type IntegrationType =
     | 'inventory'
     | 'other'
 
-export type IntegrationEvent = {
-    integrationTarget: IntegrationTarget
-    integrationType: IntegrationType
-    integrationResult: 'success' | 'failure' | 'pending'
-    integrationError?: string
-}
+export type IntegrationEvent =
+    | {
+          type: 'integration-started'
+          integrationTarget: IntegrationTarget
+          integrationType: IntegrationType
+      }
+    | {
+          type: 'integration-completed'
+          integrationTarget: IntegrationTarget
+          integrationType: IntegrationType
+          integrationResult: 'success' | 'failure'
+          integrationError?: string
+      }
 
 export const tripevents: IntegrationEvent[] = [
     {
+        type: 'integration-completed',
         integrationTarget: 'acelerador',
         integrationType: 'order',
         integrationResult: 'failure',
         integrationError: 'Timeout ao acessar sistema externo'
     },
     {
+        type: 'integration-completed',
         integrationTarget: 'acelerador',
         integrationType: 'order',
         integrationResult: 'success'
     },
     {
+        type: 'integration-completed',
         integrationTarget: 'esl',
         integrationType: 'customer',
         integrationResult: 'failure',
         integrationError: 'Dados inválidos do cliente'
     },
     {
+        type: 'integration-completed',
         integrationTarget: 'esl',
         integrationType: 'customer',
         integrationResult: 'success'
     }
 ]
 
-export type IntegrationState = { status: 'success' | 'failure' | 'sending'; error?: string }
+export type IntegrationState = { status: 'success' | 'failure' | 'pending'; error?: string }
 
 export const initialState: IntegrationState = { status: 'success' }
 
@@ -49,13 +60,15 @@ export const evolve = (
     state: IntegrationState,
     event: IntegrationEvent
 ): IntegrationState => {
+    if (event.type === 'integration-started') {
+        return { status: 'pending' }
+    }
+
     if (event.integrationResult === 'success') {
         return { status: 'success' }
-    } else if (event.integrationResult === 'failure') {
-        return { status: 'failure', error: event.integrationError }
-    } else {
-        return { status: 'sending' }
     }
+
+    return { status: 'failure', error: event.integrationError }
 }
 
 // Reduz todos os eventos até o estado global de integração.
