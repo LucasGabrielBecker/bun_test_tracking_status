@@ -115,8 +115,8 @@ const SCENARIOS: Scenario[] = [
                 integrationResult: 'failure',
                 integrationError: 'Timeout ao acessar sistema externo'
             },
-            { type: 'integration-completed', integrationTarget: 'esl', integrationType: 'customer', integrationResult: 'success' },
-            { type: 'integration-completed', integrationTarget: 'esl', integrationType: 'other', integrationResult: 'failure', integrationError: 'Erro ao acessar sistema externo' }
+            { type: 'integration-started', integrationTarget: 'esl', integrationType: 'customer'},
+            { type: 'integration-completed', integrationTarget: 'esl', integrationType: 'other', integrationResult: 'success', integrationError: 'Erro ao acessar sistema externo' }
 
         ]
     },
